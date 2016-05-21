@@ -1,6 +1,8 @@
 package src.speed;
 
 import java.awt.EventQueue;
+import java.io.*;
+import java.util.ArrayList;
 import java.awt.Toolkit;
 
 import javax.swing.JFileChooser;
@@ -22,7 +24,9 @@ public class PageSpeed {
 	private JFrame frame;
 	private JTextField textField;
 	final JFileChooser browse = new JFileChooser();
-
+	ArrayList<String> css_files=new ArrayList<String>();
+	ArrayList<String> js_files=new ArrayList<String>();
+	ArrayList<String> html_files=new ArrayList<String>();
 	/**
 	 * Launch the application.
 	 */
@@ -114,34 +118,97 @@ public class PageSpeed {
 		
 		
 		JButton btnBrowse = new JButton("Browse");
+		//browse
 		btnBrowse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			 browse.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			 int returnVal = browse.showOpenDialog(frame);
-			 textField.setText(browse.getSelectedFile().getAbsolutePath());
+				 browse.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				 int returnVal = browse.showOpenDialog(frame);
+				 if(returnVal == JFileChooser.APPROVE_OPTION)
+				 textField.setText(browse.getSelectedFile().getAbsolutePath());
+				 else
+					 textField.setText("No Folder Selected");
+			 
+			
+			
+			
 			}
 		});
 		btnBrowse.setBounds(630, 76, 89, 23);
 		frame.getContentPane().add(btnBrowse);
-		
+	// Html Button	
 		JButton btnMinifyHtml = new JButton("Minify HTML");
 		btnMinifyHtml.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				 minifyHtmlFunction(browse.getSelectedFile(),"html");
 			}
 		});
 		btnMinifyHtml.setBounds(52, 164, 198, 23);
 		frame.getContentPane().add(btnMinifyHtml);
-		
+   // Js Button
 		JButton btnMinifyJs = new JButton("Minify JS");
+		
+		btnMinifyJs.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				 minifyJsFunction(browse.getSelectedFile(),"js");
+				 YuiAction yuiAction = new YuiAction(js_files);
+					yuiAction.yui();
+			}			
+		});
 		btnMinifyJs.setBounds(52, 282, 198, 23);
 		frame.getContentPane().add(btnMinifyJs);
-		
+	// Css Button
 		JButton btnMinifyCss = new JButton("Minify CSS");
 		btnMinifyCss.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				 
+				minifyCssFunction(browse.getSelectedFile(),"css");
+				//System.out.println(css_files.get(2)); 
+				 YuiAction yuiAction = new YuiAction(css_files);
+				yuiAction.yui();
+				 
 			}
 		});
 		btnMinifyCss.setBounds(52, 224, 198, 23);
 		frame.getContentPane().add(btnMinifyCss);
 	}
+	public void minifyHtmlFunction(File fileName, String extnsn){
+		listFilesForFolder(  fileName , extnsn);	
+		System.out.println(html_files);
+	}
+	public void minifyCssFunction(File fileName, String extnsn){
+		listFilesForFolder(  fileName , extnsn);	
+		System.out.println(css_files);
+	}
+	public void minifyJsFunction(File fileName, String extnsn){
+		listFilesForFolder(  fileName , extnsn);	
+		System.out.println(js_files);
+	}
+	public void listFilesForFolder(final File folder,String extnsn) {
+		 
+	    for (final File fileEntry : folder.listFiles()) {
+	        if (fileEntry.isDirectory()) {
+	            listFilesForFolder(fileEntry,extnsn);
+	        } else {
+	        	String tokens[]=fileEntry.getName().split("\\.(?=[^\\.]+$)");
+	        	//System.out.println(tokens.length);
+
+	        	
+//	        	for(String s:tokens){
+//	        		System.out.println(s);
+//	        	}
+	        	String ext=tokens[(tokens.length-1)];
+	        	//System.out.println(extnsn.equals(ext));
+	        	if(extnsn.equals(ext)){
+	          //  System.out.println(fileEntry.getName());
+	             if(ext.equals("js"))
+	            	 js_files.add(fileEntry.toString());
+	             else if(ext.equals("css"))
+	            	 css_files.add(fileEntry.toString());
+	             else if(ext.equals("html")||ext.equals("htm"))
+	            	 html_files.add(fileEntry.toString());
+	        	}
+	        }
+	    }
+	}
 }
+
